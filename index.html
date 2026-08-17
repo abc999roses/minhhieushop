@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cửa Hàng Của Minh Hiếu</title>
+  
+  <!-- Font chữ từ Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Roboto', sans-serif; margin: 0; padding: 20px; background: #f4f4f9; }
+    h1, h2, h3 { font-family: 'Montserrat', sans-serif; text-align: center; color: #333; }
+    .container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+    
+    /* Thiết kế thẻ sản phẩm */
+    .product-card { 
+      background: #eef2f5; 
+      padding: 15px; 
+      border-radius: 8px; 
+      width: 250px; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+      text-align: center; 
+    }
+    
+    /* Thiết kế ảnh sản phẩm có viền */
+    .product-card img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+    
+    .price { color: #d9534f; font-weight: bold; font-size: 1.2em; margin: 10px 0; }
+    button { background: #0068ff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: 500;}
+    button:hover { background: #0055d4; }
+    
+    /* Giao diện giỏ hàng */
+    .cart-section { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .total-price { text-align: right; font-size: 1.5em; color: #d9534f; font-weight: bold; margin-top: 15px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif;}
+    #loading { text-align: center; font-size: 1.2em; color: #666; margin-top: 50px; }
+  </style>
+</head>
+<body>
+
+  <h1>CỬA HÀNG CỦA MINH HIẾU</h1>
+  <div id="loading">Đang kết nối dữ liệu cửa hàng...</div>
+  <div class="container" id="product-list"></div>
+
+  <div class="cart-section" id="cart-section" style="display: none;">
+    <h2>Giỏ hàng của bạn</h2>
+    <div id="cart-items"></div>
+    <div class="total-price" id="total-price">Tổng cộng: 0đ</div>
+
+    <div style="margin-top: 20px;">
+      <h3>Thông tin nhận hàng</h3>
+      <div class="form-group"><input type="text" id="customer-name" placeholder="Tên của bạn" required></div>
+      <div class="form-group"><input type="text" id="customer-phone" placeholder="Số điện thoại Zalo" required></div>
+      <div class="form-group"><input type="text" id="customer-address" placeholder="Địa chỉ giao hàng (Tùy chọn)"></div>
+      <button onclick="checkout()" style="background: #28a745;">Lưu & Mở Zalo Gửi Đơn</button>
+    </div>
+  </div>
+
+  <script>
+    // === BẠN HÃY DÁN LINK WEB APP CỦA GOOGLE SCRIPT VÀO DƯỚI ĐÂY ===
+    const API_URL = "https://script.google.com/macros/s/AKfycby6UyHtOTUpx9o841UXf1DlUf-Pbvonf3e8IpHpnEFudmdfDdkRuLsz_wtEr3vKFdm_/exec"; 
+    
+    // === SỐ ĐIỆN THOẠI ZALO CỦA BẠN ===
+    const zaloPhone = "84355967766"; 
+    
+    let cart = [];
+
+    // Lấy dữ liệu từ Google Sheet thông qua API
+    async function loadProducts() {
+      try {
+        let response = await fetch(API_URL);
+        let products = await response.json();
+        renderProducts(products);
+      } catch (error) {
+        document.getElementById('loading').innerText = "Không thể tải dữ liệu, vui lòng kiểm tra lại Link API!";
+      }
+    }
+
+    function formatMoney(amount) {
+      return Number(amount).toLocaleString('vi-VN') + "đ";
+    }
+
+    function renderProducts(products) {
+      document.getElementById('loading').style.display = 'none';
+      const list = document.getElementById('product-list');
+      
+      products.forEach(p => {
+        let card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p style="font-size:0.9em; color:#666;">${p.desc}</p>
+          <div class="price">${formatMoney(p.price)}</div>
+          <button onclick="addToCart('${p.id}', '${p.name}', ${p.price})">Thêm vào giỏ</button>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function addToCart(id, name, price) {
+      let item = cart.find(i => i.id === id);
+      if (item) { item.qty++; } else { cart.push({ id, name, price, qty: 1 }); }
+      updateCart();
+      alert("Đã thêm " + name + " vào giỏ hàng!");
+    }
+
+    function updateCart() {
+      const cartDiv = document.getElementById('cart-items');
+      const cartSection = document.getElementById('cart-section');
+      cartDiv.innerHTML = '';
+      let total = 0;
+
+      if (cart.length > 0) { cartSection.style.display = 'block'; } else { cartSection.style.display = 'none'; }
+
+      cart.forEach((item, index) => {
+        let itemTotal = item.price * item.qty;
+        total += itemTotal;
+        cartDiv.innerHTML += `
+          <div class="cart-item">
+            <div><b>${item.name}</b> x ${item.qty}</div>
+            <div>${formatMoney(itemTotal)} <span style="color:red;cursor:pointer;margin-left:10px;" onclick="removeItem(${index})">Xóa</span></div>
+          </div>
+        `;
+      });
+      document.getElementById('total-price').innerText = "Tổng cộng: " + formatMoney(total);
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      updateCart();
+    }
+
+    function checkout() {
+      const name = document.getElementById('customer-name').value;
+      const phone = document.getElementById('customer-phone').value;
+      const address = document.getElementById('customer-address').value;
+
+      if (!name || !phone) { alert("Vui lòng nhập Tên và Số điện thoại!"); return; }
+
+      let orderText = "🛒 ĐƠN ĐẶT HÀNG MỚI\n";
+      orderText += "👤 Khách: " + name + "\n";
+      orderText += "📞 SĐT: " + phone + "\n";
+      if(address) orderText += "📍 Địa chỉ: " + address + "\n";
+      orderText += "------------------------\n";
+      
+      let total = 0;
+      cart.forEach(item => {
+        orderText += `- ${item.name} (x${item.qty}): ${formatMoney(item.price * item.qty)}\n`;
+        total += (item.price * item.qty);
+      });
+      
+      orderText += "------------------------\n";
+      orderText += "💰 TỔNG TIỀN: " + formatMoney(total);
+
+      // Copy vào Clipboard và mở Zalo
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = orderText;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      
+      try {
+        document.execCommand("copy");
+        alert("📋 ĐÃ LƯU ĐƠN HÀNG!\n\nHệ thống sẽ mở Zalo của Shop. Bạn chỉ cần bấm DÁN (Paste) vào khung chat để gửi đơn nhé!");
+      } catch (err) {
+        alert("Trình duyệt không hỗ trợ copy tự động. Vui lòng nhắn tin trực tiếp cho Shop nhé!");
+      }
+      document.body.removeChild(tempTextArea);
+      window.open("https://zalo.me/" + zaloPhone, "_blank");
+    }
+
+    // Tự động lấy dữ liệu khi tải trang
+    window.onload = loadProducts;
+  </script>
+</body>
+</html>

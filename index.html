@@ -13,7 +13,7 @@
     h1, h2, h3 { font-family: 'Montserrat', sans-serif; text-align: center; color: #333; }
     .container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
     
-    /* Thiết kế thẻ sản phẩm */
+    /* Tối ưu thẻ sản phẩm thành cột linh hoạt (Flexbox) */
     .product-card { 
       background: #eef2f5; 
       padding: 15px; 
@@ -21,13 +21,64 @@
       width: 250px; 
       box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
       text-align: center; 
+      display: flex; 
+      flex-direction: column; 
     }
     
-    /* Thiết kế ảnh sản phẩm có viền */
-    .product-card img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+    .product-card img { 
+      max-width: 100%; 
+      height: 200px; 
+      object-fit: cover; 
+      border-radius: 5px; 
+      border: 1px solid #ccc; 
+      box-sizing: border-box; 
+    }
     
-    .price { color: #d9534f; font-weight: bold; font-size: 1.2em; margin: 10px 0; }
-    button { background: #0068ff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: 500;}
+    /* Giới hạn tiêu đề tối đa 2 dòng, phần thừa sẽ biến thành dấu ... */
+    .product-card h3 {
+      font-size: 16px;
+      margin: 15px 0 5px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; 
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 40px; 
+    }
+
+    /* Giới hạn mô tả tối đa 3 dòng và tự động chiếm không gian trống để đẩy nút bấm xuống */
+    .product-card p {
+      font-size: 13px;
+      color: #666;
+      margin: 0 0 15px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; 
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-grow: 1; 
+    }
+    
+    /* Lực đẩy tự động (margin-top: auto) giúp Giá và Nút luôn nằm sát đáy thẻ */
+    .price { 
+      color: #d9534f; 
+      font-weight: bold; 
+      font-size: 1.2em; 
+      margin-top: auto; 
+      margin-bottom: 15px;
+    }
+    
+    button { 
+      background: #0068ff; 
+      color: white; 
+      border: none; 
+      padding: 10px 15px; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      width: 100%; 
+      font-size: 16px; 
+      font-family: 'Roboto', sans-serif; 
+      font-weight: 500;
+    }
+    
     button:hover { background: #0055d4; }
     
     /* Giao diện giỏ hàng */

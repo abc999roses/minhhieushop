@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cửa Hàng Của Minh Hiếu</title>
+  <title>Cửa Hàng Của Tôi</title>
   
   <!-- Font chữ từ Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
@@ -25,60 +25,17 @@
       flex-direction: column; 
     }
     
-    .product-card img { 
-      max-width: 100%; 
-      height: 200px; 
-      object-fit: cover; 
-      border-radius: 5px; 
-      border: 1px solid #ccc; 
-      box-sizing: border-box; 
-    }
+    .product-card img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
     
-    /* Giới hạn tiêu đề tối đa 2 dòng, phần thừa sẽ biến thành dấu ... */
-    .product-card h3 {
-      font-size: 16px;
-      margin: 15px 0 5px 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2; 
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      min-height: 40px; 
-    }
+    /* Giới hạn tiêu đề tối đa 2 dòng */
+    .product-card h3 { font-size: 16px; margin: 15px 0 5px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px; }
 
-    /* Giới hạn mô tả tối đa 3 dòng và tự động chiếm không gian trống để đẩy nút bấm xuống */
-    .product-card p {
-      font-size: 13px;
-      color: #666;
-      margin: 0 0 15px 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 3; 
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      flex-grow: 1; 
-    }
+    /* Giới hạn mô tả tối đa 3 dòng và tự động chiếm không gian trống */
+    .product-card p { font-size: 13px; color: #666; margin: 0 0 15px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex-grow: 1; }
     
-    /* Lực đẩy tự động (margin-top: auto) giúp Giá và Nút luôn nằm sát đáy thẻ */
-    .price { 
-      color: #d9534f; 
-      font-weight: bold; 
-      font-size: 1.2em; 
-      margin-top: auto; 
-      margin-bottom: 15px;
-    }
-    
-    button { 
-      background: #0068ff; 
-      color: white; 
-      border: none; 
-      padding: 10px 15px; 
-      border-radius: 5px; 
-      cursor: pointer; 
-      width: 100%; 
-      font-size: 16px; 
-      font-family: 'Roboto', sans-serif; 
-      font-weight: 500;
-    }
-    
+    /* Đẩy giá tiền và nút bấm xuống đáy thẻ */
+    .price { color: #d9534f; font-weight: bold; font-size: 1.2em; margin-top: auto; margin-bottom: 15px;}
+    button { background: #0068ff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: 500;}
     button:hover { background: #0055d4; }
     
     /* Giao diện giỏ hàng */
@@ -88,13 +45,38 @@
     .form-group { margin-bottom: 15px; }
     .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif;}
     #loading { text-align: center; font-size: 1.2em; color: #666; margin-top: 50px; }
+
+    /* Nút giỏ hàng nổi */
+    #floating-cart {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #ff4757; 
+      color: white;
+      padding: 15px 25px;
+      border-radius: 50px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 1000;
+      font-weight: bold;
+      font-family: 'Montserrat', sans-serif;
+      display: none; 
+      transition: transform 0.2s;
+    }
+    #floating-cart:hover { transform: scale(1.05); }
+    #cart-count { background: white; color: #ff4757; border-radius: 50px; padding: 2px 8px; margin-left: 8px; font-size: 14px; }
   </style>
 </head>
 <body>
 
-  <h1>CỬA HÀNG CỦA MINH HIẾU</h1>
+  <h1>CỬA HÀNG CỦA MÌNH HIẾU</h1>
   <div id="loading">Đang kết nối dữ liệu cửa hàng...</div>
   <div class="container" id="product-list"></div>
+
+  <!-- Nút giỏ hàng nổi -->
+  <div id="floating-cart" onclick="scrollToCart()">
+    🛒 Giỏ hàng <span id="cart-count">0</span>
+  </div>
 
   <div class="cart-section" id="cart-section" style="display: none;">
     <h2>Giỏ hàng của bạn</h2>
@@ -111,7 +93,7 @@
   </div>
 
   <script>
-    // === BẠN HÃY DÁN LINK WEB APP CỦA GOOGLE SCRIPT VÀO DƯỚI ĐÂY ===
+    // === DÁN LINK WEB APP CỦA GOOGLE SCRIPT VÀO DƯỚI ĐÂY ===
     const API_URL = "https://script.google.com/macros/s/AKfycby6UyHtOTUpx9o841UXf1DlUf-Pbvonf3e8IpHpnEFudmdfDdkRuLsz_wtEr3vKFdm_/exec"; 
     
     // === SỐ ĐIỆN THOẠI ZALO CỦA BẠN ===
@@ -119,7 +101,6 @@
     
     let cart = [];
 
-    // Lấy dữ liệu từ Google Sheet thông qua API
     async function loadProducts() {
       try {
         let response = await fetch(API_URL);
@@ -144,7 +125,7 @@
         card.innerHTML = `
           <img src="${p.image}" alt="${p.name}">
           <h3>${p.name}</h3>
-          <p style="font-size:0.9em; color:#666;">${p.desc}</p>
+          <p>${p.desc}</p>
           <div class="price">${formatMoney(p.price)}</div>
           <button onclick="addToCart('${p.id}', '${p.name}', ${p.price})">Thêm vào giỏ</button>
         `;
@@ -162,14 +143,24 @@
     function updateCart() {
       const cartDiv = document.getElementById('cart-items');
       const cartSection = document.getElementById('cart-section');
+      const floatingCart = document.getElementById('floating-cart');
+      
       cartDiv.innerHTML = '';
       let total = 0;
+      let totalQty = 0; 
 
-      if (cart.length > 0) { cartSection.style.display = 'block'; } else { cartSection.style.display = 'none'; }
+      if (cart.length > 0) { 
+        cartSection.style.display = 'block'; 
+        floatingCart.style.display = 'block'; 
+      } else { 
+        cartSection.style.display = 'none'; 
+        floatingCart.style.display = 'none'; 
+      }
 
       cart.forEach((item, index) => {
         let itemTotal = item.price * item.qty;
         total += itemTotal;
+        totalQty += item.qty;
         cartDiv.innerHTML += `
           <div class="cart-item">
             <div><b>${item.name}</b> x ${item.qty}</div>
@@ -177,12 +168,18 @@
           </div>
         `;
       });
+      
       document.getElementById('total-price').innerText = "Tổng cộng: " + formatMoney(total);
+      document.getElementById('cart-count').innerText = totalQty; 
     }
 
     function removeItem(index) {
       cart.splice(index, 1);
       updateCart();
+    }
+
+    function scrollToCart() {
+      document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
     }
 
     function checkout() {
@@ -207,7 +204,6 @@
       orderText += "------------------------\n";
       orderText += "💰 TỔNG TIỀN: " + formatMoney(total);
 
-      // Copy vào Clipboard và mở Zalo
       const tempTextArea = document.createElement("textarea");
       tempTextArea.value = orderText;
       document.body.appendChild(tempTextArea);
@@ -223,7 +219,6 @@
       window.open("https://zalo.me/" + zaloPhone, "_blank");
     }
 
-    // Tự động lấy dữ liệu khi tải trang
     window.onload = loadProducts;
   </script>
 </body>

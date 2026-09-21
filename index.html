@@ -148,6 +148,7 @@
       cartDiv.innerHTML = '';
       let total = 0;
       let totalQty = 0; 
+      const shippingFee = 18000; // Cố định phí ship 18k
 
       if (cart.length > 0) { 
         cartSection.style.display = 'block'; 
@@ -172,10 +173,21 @@
         `;
       });
       
-      document.getElementById('total-price').innerText = "Tổng cộng: " + formatMoney(total);
+      // Hiển thị tách biệt Tiền hàng, Phí ship và Tổng cộng
+      if (total > 0) {
+        let finalTotal = total + shippingFee;
+        document.getElementById('total-price').innerHTML = `
+          <div style="font-size: 0.7em; color: #666; font-weight: normal;">Tiền hàng: ${formatMoney(total)}</div>
+          <div style="font-size: 0.7em; color: #666; font-weight: normal;">Phí ship: ${formatMoney(shippingFee)}</div>
+          <div style="margin-top: 5px;">Tổng cộng: ${formatMoney(finalTotal)}</div>
+        `;
+      } else {
+        document.getElementById('total-price').innerText = "Tổng cộng: 0đ";
+      }
+      
       document.getElementById('cart-count').innerText = totalQty; 
     }
-
+    
     function removeItem(index) {
       cart.splice(index, 1);
       updateCart();
@@ -189,6 +201,7 @@
       const name = document.getElementById('customer-name').value;
       const phone = document.getElementById('customer-phone').value;
       const address = document.getElementById('customer-address').value;
+      const shippingFee = 18000; // Cố định phí ship 18k
 
       if (!name || !phone) { alert("Vui lòng nhập Tên và Số điện thoại!"); return; }
 
@@ -204,8 +217,12 @@
         total += (item.price * item.qty);
       });
       
+      let finalTotal = total + shippingFee;
+
       orderText += "------------------------\n";
-      orderText += "💰 TỔNG TIỀN: " + formatMoney(total);
+      orderText += "📦 Tiền hàng: " + formatMoney(total) + "\n";
+      orderText += "🚚 Phí giao hàng: " + formatMoney(shippingFee) + "\n";
+      orderText += "💰 TỔNG THANH TOÁN: " + formatMoney(finalTotal);
 
       const tempTextArea = document.createElement("textarea");
       tempTextArea.value = orderText;
@@ -221,7 +238,7 @@
       document.body.removeChild(tempTextArea);
       window.open("https://zalo.me/" + zaloPhone, "_blank");
     }
-
+    
     window.onload = loadProducts;
   </script>
 </body>

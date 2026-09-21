@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cửa Hàng Của Minh Hiếu</title>
   
-  <!-- Font chữ từ Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   
   <style>
@@ -13,56 +12,35 @@
     h1, h2, h3 { font-family: 'Montserrat', sans-serif; text-align: center; color: #333; }
     .container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
     
-    /* Tối ưu thẻ sản phẩm thành cột linh hoạt (Flexbox) */
-    .product-card { 
-      background: #eef2f5; 
-      padding: 15px; 
-      border-radius: 8px; 
-      width: 250px; 
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-      text-align: center; 
-      display: flex; 
-      flex-direction: column; 
-    }
-    
+    .product-card { background: #eef2f5; padding: 15px; border-radius: 8px; width: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; display: flex; flex-direction: column; }
     .product-card img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
-    
-    /* Giới hạn tiêu đề tối đa 2 dòng */
     .product-card h3 { font-size: 16px; margin: 15px 0 5px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px; }
-
-    /* Giới hạn mô tả tối đa 3 dòng và tự động chiếm không gian trống */
     .product-card p { font-size: 13px; color: #666; margin: 0 0 15px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex-grow: 1; }
-    
-    /* Đẩy giá tiền và nút bấm xuống đáy thẻ */
     .price { color: #d9534f; font-weight: bold; font-size: 1.2em; margin-top: auto; margin-bottom: 15px;}
+    
     button { background: #0068ff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: 500;}
     button:hover { background: #0055d4; }
     
-    /* Giao diện giỏ hàng */
     .cart-section { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .cart-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; gap: 15px; }
+    .cart-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; gap: 15px;}
     .total-price { text-align: right; font-size: 1.5em; color: #d9534f; font-weight: bold; margin-top: 15px; }
+    
+    /* Giao diện Form nhập liệu */
     .form-group { margin-bottom: 15px; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif;}
-    #loading { text-align: center; font-size: 1.2em; color: #666; margin-top: 50px; }
-
-    /* Nút giỏ hàng nổi */
-    #floating-cart {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #ff4757; 
-      color: white;
-      padding: 15px 25px;
-      border-radius: 50px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      cursor: pointer;
-      z-index: 1000;
-      font-weight: bold;
-      font-family: 'Montserrat', sans-serif;
-      display: none; 
-      transition: transform 0.2s;
+    .form-group input, .form-group select { 
+      width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: 'Roboto', sans-serif; font-size: 15px; background: white;
     }
+    
+    /* Mũi tên cho ô chọn địa chỉ */
+    .form-group select {
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+      background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto;
+    }
+    .form-group select:disabled { background-color: #f9f9f9; cursor: not-allowed; opacity: 0.7;}
+    
+    #loading { text-align: center; font-size: 1.2em; color: #666; margin-top: 50px; }
+    #floating-cart { position: fixed; bottom: 20px; right: 20px; background-color: #ff4757; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 1000; font-weight: bold; font-family: 'Montserrat', sans-serif; display: none; transition: transform 0.2s; }
     #floating-cart:hover { transform: scale(1.05); }
     #cart-count { background: white; color: #ff4757; border-radius: 50px; padding: 2px 8px; margin-left: 8px; font-size: 14px; }
   </style>
@@ -73,7 +51,6 @@
   <div id="loading">Đang kết nối dữ liệu cửa hàng...</div>
   <div class="container" id="product-list"></div>
 
-  <!-- Nút giỏ hàng nổi -->
   <div id="floating-cart" onclick="scrollToCart()">
     🛒 Giỏ hàng <span id="cart-count">0</span>
   </div>
@@ -83,12 +60,28 @@
     <div id="cart-items"></div>
     <div class="total-price" id="total-price">Tổng cộng: 0đ</div>
 
-    <div style="margin-top: 20px;">
+    <div style="margin-top: 30px;">
       <h3>Thông tin nhận hàng</h3>
-      <div class="form-group"><input type="text" id="customer-name" placeholder="Tên của bạn" required></div>
-      <div class="form-group"><input type="text" id="customer-phone" placeholder="Số điện thoại Zalo" required></div>
-      <div class="form-group"><input type="text" id="customer-address" placeholder="Địa chỉ giao hàng (Tùy chọn)"></div>
-      <button onclick="checkout()" style="background: #28a745;">Lưu & Mở Zalo Gửi Đơn</button>
+      <div class="form-group"><input type="text" id="customer-name" placeholder="Tên người nhận *" required></div>
+      <div class="form-group"><input type="number" id="customer-phone" placeholder="Số điện thoại Zalo *" required></div>
+      
+      <!-- Giao diện nhập địa chỉ đã đổi thứ tự -->
+      <div class="form-group">
+        <select id="tinh" onchange="fetchPhuong(this.value)" required>
+          <option value="">Chọn Tỉnh / Thành phố *</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <select id="phuong" required disabled>
+          <option value="">Chọn Phường / Xã *</option>
+        </select>
+      </div>
+      <div class="form-group"><input type="text" id="customer-address-detail" placeholder="Địa chỉ chi tiết (Số nhà, đường, ngõ...) *" required></div>
+      
+      <!-- Ô nhập Ghi chú mới -->
+      <div class="form-group"><input type="text" id="customer-note" placeholder="Ghi chú (Tùy chọn)"></div>
+
+      <button onclick="checkout()" style="background: #ee4d2d; margin-top: 10px;">Lưu & Mở Zalo Gửi Đơn</button>
     </div>
   </div>
 
@@ -101,6 +94,11 @@
     
     let cart = [];
 
+    window.onload = function() {
+      loadProducts();
+      fetchTinh(); 
+    };
+
     async function loadProducts() {
       try {
         let response = await fetch(API_URL);
@@ -111,9 +109,49 @@
       }
     }
 
-    function formatMoney(amount) {
-      return Number(amount).toLocaleString('vi-VN') + "đ";
+    // 1. Lấy danh sách Tỉnh/Thành
+    async function fetchTinh() {
+      try {
+        let res = await fetch('https://provinces.open-api.vn/api/v2/p/');
+        let data = await res.json();
+        let html = '<option value="">Chọn Tỉnh / Thành phố *</option>';
+        data.forEach(item => { 
+          html += `<option value="${item.code}">${item.name}</option>`; 
+        });
+        document.getElementById('tinh').innerHTML = html;
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách Tỉnh:", error);
+      }
     }
+
+    // 2. Lấy danh sách Phường/Xã trực tiếp từ Tỉnh
+    async function fetchPhuong(idTinh) {
+      let phuongSelect = document.getElementById('phuong');
+      phuongSelect.innerHTML = '<option value="">Chọn Phường / Xã *</option>';
+      
+      if(!idTinh) { 
+        phuongSelect.disabled = true; 
+        return; 
+      }
+      phuongSelect.disabled = false;
+      
+      try {
+        let res = await fetch(`https://provinces.open-api.vn/api/v2/p/${idTinh}?depth=2`);
+        let data = await res.json();
+        let html = '<option value="">Chọn Phường / Xã *</option>';
+        
+        if (data.wards) {
+          data.wards.forEach(item => { 
+            html += `<option value="${item.code}">${item.name}</option>`; 
+          });
+        }
+        phuongSelect.innerHTML = html;
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách Phường/Xã:", error);
+      }
+    }
+
+    function formatMoney(amount) { return Number(amount).toLocaleString('vi-VN') + "đ"; }
 
     function renderProducts(products) {
       document.getElementById('loading').style.display = 'none';
@@ -148,7 +186,7 @@
       cartDiv.innerHTML = '';
       let total = 0;
       let totalQty = 0; 
-      const shippingFee = 18000; // Cố định phí ship 18k
+      const shippingFee = 18000;
 
       if (cart.length > 0) { 
         cartSection.style.display = 'block'; 
@@ -173,21 +211,18 @@
         `;
       });
       
-      // Hiển thị tách biệt Tiền hàng, Phí ship và Tổng cộng
       if (total > 0) {
         let finalTotal = total + shippingFee;
         document.getElementById('total-price').innerHTML = `
           <div style="font-size: 0.7em; color: #666; font-weight: normal;">Tiền hàng: ${formatMoney(total)}</div>
-          <div style="font-size: 0.7em; color: #666; font-weight: normal;">Phí ship: ${formatMoney(shippingFee)}</div>
-          <div style="margin-top: 5px;">Tổng cộng: ${formatMoney(finalTotal)}</div>
+          <div style="font-size: 0.7em; color: #666; font-weight: normal;">Phí giao hàng: ${formatMoney(shippingFee)}</div>
+          <div style="margin-top: 5px; color: #ee4d2d;">Tổng cộng: ${formatMoney(finalTotal)}</div>
         `;
-      } else {
-        document.getElementById('total-price').innerText = "Tổng cộng: 0đ";
       }
       
       document.getElementById('cart-count').innerText = totalQty; 
     }
-    
+
     function removeItem(index) {
       cart.splice(index, 1);
       updateCart();
@@ -200,15 +235,29 @@
     function checkout() {
       const name = document.getElementById('customer-name').value;
       const phone = document.getElementById('customer-phone').value;
-      const address = document.getElementById('customer-address').value;
-      const shippingFee = 18000; // Cố định phí ship 18k
+      const detailAddress = document.getElementById('customer-address-detail').value;
+      const note = document.getElementById('customer-note').value; // Lấy dữ liệu ghi chú
+      
+      const tinhSelect = document.getElementById('tinh');
+      const phuongSelect = document.getElementById('phuong');
+      
+      const tinhName = tinhSelect.options[tinhSelect.selectedIndex]?.text || '';
+      const phuongName = phuongSelect.options[phuongSelect.selectedIndex]?.text || '';
 
-      if (!name || !phone) { alert("Vui lòng nhập Tên và Số điện thoại!"); return; }
+      const shippingFee = 18000;
+
+      if (!name || !phone || !detailAddress || !tinhSelect.value || !phuongSelect.value) { 
+        alert("Vui lòng điền đầy đủ Thông tin cá nhân và Địa chỉ nhận hàng!"); 
+        return; 
+      }
+
+      let fullAddress = `${detailAddress}, ${phuongName}, ${tinhName}`;
 
       let orderText = "🛒 ĐƠN ĐẶT HÀNG MỚI\n";
       orderText += "👤 Khách: " + name + "\n";
       orderText += "📞 SĐT: " + phone + "\n";
-      if(address) orderText += "📍 Địa chỉ: " + address + "\n";
+      orderText += "📍 Địa chỉ: " + fullAddress + "\n";
+      if(note) orderText += "📝 Ghi chú: " + note + "\n"; // Chèn ghi chú nếu có
       orderText += "------------------------\n";
       
       let total = 0;
@@ -238,8 +287,6 @@
       document.body.removeChild(tempTextArea);
       window.open("https://zalo.me/" + zaloPhone, "_blank");
     }
-    
-    window.onload = loadProducts;
   </script>
 </body>
 </html>

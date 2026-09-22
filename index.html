@@ -13,24 +13,34 @@
     .container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
     
     .product-card { position: relative; background: #eef2f5; padding: 15px; border-radius: 8px; width: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; display: flex; flex-direction: column; }
-    
-    /* Thiết kế Nhãn giảm giá (Discount Badge) */
     .discount-badge { position: absolute; top: 10px; right: 10px; background: #ffd127; color: #ee4d2d; padding: 4px 8px; font-size: 13px; font-weight: bold; border-radius: 3px; z-index: 10;}
-    
     .product-card img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
     .product-card h3 { font-size: 16px; margin: 15px 0 5px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px; }
     .product-card p { font-size: 13px; color: #666; margin: 0 0 15px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex-grow: 1; }
     
-    /* Vùng chứa giá (Luôn giữ 2 dòng để thẻ không bị xô lệch) */
-    .price-container { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; margin-top: auto; margin-bottom: 15px; min-height: 45px;}
+    .price-container { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; margin-top: auto; margin-bottom: 12px; min-height: 45px;}
     .original-price { color: #888; text-decoration: line-through; font-size: 0.9em; margin-bottom: 2px; }
     .current-price { color: #ee4d2d; font-weight: bold; font-size: 1.3em; }
     
-    button { background: #0068ff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: 500;}
-    button:hover { background: #0055d4; }
+    /* Thiết kế Nút bấm chính (Thêm giỏ hàng, Thanh toán) */
+    .btn-primary { background: #0068ff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: 500;}
+    .btn-primary:hover { background: #0055d4; }
     
+    /* Thiết kế Bộ nút Tăng/Giảm số lượng */
+    .qty-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+    .qty-btn { background: #e0e0e0; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 18px; font-weight: bold; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);}
+    .qty-btn:hover { background: #ccc; }
+    .qty-input { width: 45px; height: 32px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; font-family: 'Roboto', sans-serif; box-sizing: border-box; }
+    /* Ẩn mũi tên lên/xuống mặc định của input type="number" */
+    .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    
+    /* Bộ nút số lượng thu nhỏ trong giỏ hàng */
+    .cart-qty-wrapper { display: flex; align-items: center; gap: 5px; margin-top: 8px; }
+    .qty-btn.small { width: 26px; height: 26px; font-size: 14px; }
+    .qty-input.small { width: 40px; height: 26px; font-size: 14px; }
+
     .cart-section { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .cart-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; gap: 15px;}
+    .cart-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 15px; gap: 15px;}
     .total-price { text-align: right; font-size: 1.5em; color: #d9534f; font-weight: bold; margin-top: 15px; }
     
     .form-group { margin-bottom: 15px; }
@@ -82,7 +92,7 @@
       <div class="form-group"><input type="text" id="customer-address-detail" placeholder="Địa chỉ chi tiết (Số nhà, đường, ngõ...) *" required></div>
       <div class="form-group"><input type="text" id="customer-note" placeholder="Ghi chú (Tùy chọn, VD: Giao giờ hành chính...)"></div>
 
-      <button onclick="checkout()" style="background: #ee4d2d; margin-top: 10px;">Lưu & Mở Zalo Gửi Đơn</button>
+      <button class="btn-primary" onclick="checkout()" style="background: #ee4d2d; margin-top: 10px;">Lưu & Mở Zalo Gửi Đơn</button>
     </div>
   </div>
 
@@ -115,42 +125,44 @@
         let res = await fetch('https://provinces.open-api.vn/api/v2/p/');
         let data = await res.json();
         let html = '<option value="">Chọn Tỉnh / Thành phố *</option>';
-        data.forEach(item => { 
-          html += `<option value="${item.code}">${item.name}</option>`; 
-        });
+        data.forEach(item => { html += `<option value="${item.code}">${item.name}</option>`; });
         document.getElementById('tinh').innerHTML = html;
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách Tỉnh:", error);
-      }
+      } catch (error) { console.error("Lỗi API Tỉnh:", error); }
     }
 
     async function fetchPhuong(idTinh) {
       let phuongSelect = document.getElementById('phuong');
       phuongSelect.innerHTML = '<option value="">Chọn Phường / Xã *</option>';
-      
-      if(!idTinh) { 
-        phuongSelect.disabled = true; 
-        return; 
-      }
+      if(!idTinh) { phuongSelect.disabled = true; return; }
       phuongSelect.disabled = false;
       
       try {
         let res = await fetch(`https://provinces.open-api.vn/api/v2/p/${idTinh}?depth=2`);
         let data = await res.json();
         let html = '<option value="">Chọn Phường / Xã *</option>';
-        
         if (data.wards) {
-          data.wards.forEach(item => { 
-            html += `<option value="${item.code}">${item.name}</option>`; 
-          });
+          data.wards.forEach(item => { html += `<option value="${item.code}">${item.name}</option>`; });
         }
         phuongSelect.innerHTML = html;
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách Phường/Xã:", error);
-      }
+      } catch (error) { console.error("Lỗi API Phường:", error); }
     }
 
     function formatMoney(amount) { return Number(amount).toLocaleString('vi-VN') + "đ"; }
+
+    // Xử lý tăng giảm số lượng trên Thẻ sản phẩm (chưa vào giỏ)
+    function changeProductQty(id, delta) {
+      let input = document.getElementById('qty-' + id);
+      let val = parseInt(input.value) || 1;
+      val += delta;
+      if (val < 1) val = 1;
+      input.value = val;
+    }
+    
+    function validateProductQty(id) {
+      let input = document.getElementById('qty-' + id);
+      let val = parseInt(input.value);
+      if (isNaN(val) || val < 1) input.value = 1;
+    }
 
     function renderProducts(products) {
       document.getElementById('loading').style.display = 'none';
@@ -162,42 +174,77 @@
         
         let badgeHtml = '';
         let priceHtml = '';
+        
+        let orig = Number(p.originalPrice) || 0;
+        let curr = Number(p.price) || 0;
 
-        // Hiển thị giao diện giảm giá nếu có giá gốc và giá gốc lớn hơn giá bán
-        if (p.originalPrice && Number(p.originalPrice) > Number(p.price)) {
-          let percent = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
+        if (orig > curr && curr > 0) {
+          let percent = Math.round(((orig - curr) / orig) * 100);
           badgeHtml = `<div class="discount-badge">-${percent}%</div>`;
           priceHtml = `
-            <div class="original-price">${formatMoney(p.originalPrice)}</div>
-            <div class="current-price">${formatMoney(p.price)}</div>
+            <div class="original-price">${formatMoney(orig)}</div>
+            <div class="current-price">${formatMoney(curr)}</div>
           `;
         } else {
-          // Sản phẩm không giảm giá (ẩn giá gốc để căn lề đồng đều)
           priceHtml = `
             <div class="original-price" style="visibility:hidden;">0đ</div>
-            <div class="current-price">${formatMoney(p.price)}</div>
+            <div class="current-price">${formatMoney(curr)}</div>
           `;
         }
 
+        let safeName = p.name.replace(/'/g, "\\'");
+        
         card.innerHTML = `
           ${badgeHtml}
-          <img src="${p.image}" alt="${p.name}">
+          <img src="${p.image}" alt="${safeName}">
           <h3>${p.name}</h3>
           <p>${p.desc}</p>
           <div class="price-container">
             ${priceHtml}
           </div>
-          <button onclick="addToCart('${p.id}', '${p.name}', ${p.price})">Thêm vào giỏ</button>
+          
+          <!-- Nút điều chỉnh số lượng -->
+          <div class="qty-wrapper">
+            <button class="qty-btn" onclick="changeProductQty('${p.id}', -1)">-</button>
+            <input type="number" id="qty-${p.id}" class="qty-input" value="1" min="1" onchange="validateProductQty('${p.id}')">
+            <button class="qty-btn" onclick="changeProductQty('${p.id}', 1)">+</button>
+          </div>
+          
+          <button class="btn-primary" onclick="addToCart('${p.id}', '${safeName}', ${curr})">Thêm vào giỏ</button>
         `;
         list.appendChild(card);
       });
     }
 
     function addToCart(id, name, price) {
+      // Lấy số lượng khách vừa chọn
+      let qtyInput = document.getElementById('qty-' + id);
+      let qtyToAdd = parseInt(qtyInput.value) || 1;
+
       let item = cart.find(i => i.id === id);
-      if (item) { item.qty++; } else { cart.push({ id, name, price, qty: 1 }); }
+      if (item) { 
+        item.qty += qtyToAdd; 
+      } else { 
+        cart.push({ id, name, price, qty: qtyToAdd }); 
+      }
+      
+      qtyInput.value = 1; // Khôi phục lại ô chọn về số 1
       updateCart();
-      alert("Đã thêm " + name + " vào giỏ hàng!");
+      alert(`Đã thêm ${qtyToAdd} sản phẩm [ ${name} ] vào giỏ hàng!`);
+    }
+
+    // Xử lý tăng giảm số lượng TRONG giỏ hàng
+    function changeCartQty(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty < 1) cart[index].qty = 1; // Không cho phép giảm xuống 0, muốn bỏ thì ấn Xóa
+      updateCart();
+    }
+    
+    function setCartQty(index, value) {
+      let val = parseInt(value);
+      if (isNaN(val) || val < 1) val = 1;
+      cart[index].qty = val;
+      updateCart();
     }
 
     function updateCart() {
@@ -222,12 +269,23 @@
         let itemTotal = item.price * item.qty;
         total += itemTotal;
         totalQty += item.qty;
+        
         cartDiv.innerHTML += `
           <div class="cart-item">
-            <div style="flex: 1;"><b>${item.name}</b> x ${item.qty}</div>
-            <div style="white-space: nowrap;">
-              ${formatMoney(itemTotal)} 
-              <span style="color:red; cursor:pointer; margin-left:10px; font-weight:bold;" onclick="removeItem(${index})">Xóa</span>
+            <div style="flex: 1; padding-right: 10px;">
+              <b style="font-size: 14px; line-height: 1.4;">${item.name}</b>
+              
+              <!-- Nút điều chỉnh số lượng thu nhỏ trong giỏ -->
+              <div class="cart-qty-wrapper">
+                <button class="qty-btn small" onclick="changeCartQty(${index}, -1)">-</button>
+                <input type="number" class="qty-input small" value="${item.qty}" min="1" onchange="setCartQty(${index}, this.value)">
+                <button class="qty-btn small" onclick="changeCartQty(${index}, 1)">+</button>
+              </div>
+            </div>
+            
+            <div style="white-space: nowrap; display: flex; flex-direction: column; align-items: flex-end;">
+              <span style="font-weight: 500;">${formatMoney(itemTotal)}</span>
+              <span style="color:red; cursor:pointer; margin-top:8px; font-weight:bold; font-size:0.9em;" onclick="removeItem(${index})">Xóa</span>
             </div>
           </div>
         `;

@@ -15,7 +15,6 @@
     .product-card { position: relative; background: #eef2f5; padding: 15px; border-radius: 8px; width: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; display: flex; flex-direction: column; }
     .discount-badge { position: absolute; top: 10px; right: 10px; background: #ffd127; color: #ee4d2d; padding: 4px 8px; font-size: 13px; font-weight: bold; border-radius: 3px; z-index: 10;}
     
-    /* Giao diện thanh trượt ảnh nhỏ (Carousel) */
     .carousel { position: relative; width: 100%; height: 200px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; overflow: hidden; background: #fff;}
     .carousel-slides { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
     .carousel-slides::-webkit-scrollbar { display: none; }
@@ -59,7 +58,27 @@
     }
     .form-group select:disabled { background-color: #f9f9f9; cursor: not-allowed; opacity: 0.7;}
     
-    #loading { text-align: center; font-size: 1.2em; color: #666; margin-top: 50px; }
+    /* === GIAO DIỆN LOADING CSS === */
+    .loader { background: #f4f4f9; bottom: 0; left: 0; overflow: hidden; position: fixed; right: 0; top: 0; z-index: 99999; transition: opacity 0.5s ease, visibility 0.5s ease; }
+    .loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-inner { bottom: 0; height: 60px; left: 0; margin: auto; position: absolute; right: 0; top: 0; width: 100px; }
+    .loader-line-wrap { animation: spin 2000ms cubic-bezier(.175, .885, .32, 1.275) infinite; box-sizing: border-box; height: 50px; left: 0; overflow: hidden; position: absolute; top: 0; transform-origin: 50% 100%; width: 100px; }
+    .loader-line { border: 4px solid transparent; border-radius: 100%; box-sizing: border-box; height: 100px; left: 0; margin: 0 auto; position: absolute; right: 0; top: 0; width: 100px; }
+    .loader-line-wrap:nth-child(1) { animation-delay: -50ms; }
+    .loader-line-wrap:nth-child(2) { animation-delay: -100ms; }
+    .loader-line-wrap:nth-child(3) { animation-delay: -150ms; }
+    .loader-line-wrap:nth-child(4) { animation-delay: -200ms; }
+    .loader-line-wrap:nth-child(5) { animation-delay: -250ms; }
+    .loader-line-wrap:nth-child(1) .loader-line { border-color: hsl(0, 80%, 60%); height: 90px; width: 90px; top: 7px; }
+    .loader-line-wrap:nth-child(2) .loader-line { border-color: hsl(60, 80%, 60%); height: 76px; width: 76px; top: 14px; }
+    .loader-line-wrap:nth-child(3) .loader-line { border-color: hsl(120, 80%, 60%); height: 62px; width: 62px; top: 21px; }
+    .loader-line-wrap:nth-child(4) .loader-line { border-color: hsl(180, 80%, 60%); height: 48px; width: 48px; top: 28px; }
+    .loader-line-wrap:nth-child(5) .loader-line { border-color: hsl(240, 80%, 60%); height: 34px; width: 34px; top: 35px; }
+    @keyframes spin { 0%, 15% { transform: rotate(0); } 100% { transform: rotate(360deg); } }
+    
+    /* Chỉnh khoảng cách top xuống 85px để tạo không gian thoáng hơn */
+    .loader-text { position: absolute; top: calc(50% + 85px); left: 0; width: 100%; text-align: center; color: #333; font-family: 'Montserrat', sans-serif; letter-spacing: 1px; font-size: 14px; font-weight: 600;}
+    
     #floating-cart { position: fixed; bottom: 20px; right: 20px; background-color: #ff4757; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 1000; font-weight: bold; font-family: 'Montserrat', sans-serif; display: none; transition: transform 0.2s; }
     #floating-cart:hover { transform: scale(1.05); }
     #cart-count { background: white; color: #ff4757; border-radius: 50px; padding: 2px 8px; margin-left: 8px; font-size: 14px; }
@@ -69,12 +88,18 @@
     .image-modal-content { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; user-select: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
     .close-modal { position: absolute; top: 15px; right: 25px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 2010; line-height: 1; }
     .close-modal:hover { color: #ff4757; }
+    
     .modal-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 2010; display: flex; align-items: center; justify-content: center; transition: background 0.3s;}
     .modal-nav:hover { background: rgba(255,255,255,0.5); }
     .modal-nav.prev { left: 20px; }
     .modal-nav.next { right: 20px; }
     
-    /* Ẩn nút mũi tên trên điện thoại để nhường chỗ cho vuốt chạm */
+    .modal-indicator { position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; font-weight: 500; background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 12px; z-index: 2010; user-select: none; font-family: 'Roboto', sans-serif;}
+    .modal-dots { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 2010; }
+    .modal-dot { width: 10px; height: 10px; background-color: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
+    .modal-dot:hover { background-color: rgba(255,255,255,0.8); }
+    .modal-dot.active { background-color: white; transform: scale(1.2); box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+
     @media (max-width: 600px) {
       .modal-nav { display: none; }
     }
@@ -83,7 +108,19 @@
 <body>
 
   <h1>CỬA HÀNG CỦA MINH HIẾU</h1>
-  <div id="loading">Đang kết nối dữ liệu cửa hàng...</div>
+  
+  <!-- Khu vực Loading Mới -->
+  <div id="loading" class="loader">
+    <div class="loader-inner">
+      <div class="loader-line-wrap"><div class="loader-line"></div></div>
+      <div class="loader-line-wrap"><div class="loader-line"></div></div>
+      <div class="loader-line-wrap"><div class="loader-line"></div></div>
+      <div class="loader-line-wrap"><div class="loader-line"></div></div>
+      <div class="loader-line-wrap"><div class="loader-line"></div></div>
+    </div>
+    <div class="loader-text" id="loading-text">ĐANG KẾT NỐI DỮ LIỆU...</div>
+  </div>
+  
   <div class="container" id="product-list"></div>
 
   <div id="floating-cart" onclick="scrollToCart()">
@@ -123,6 +160,9 @@
     <button class="modal-nav prev" onclick="changeModalImg(-1)">&#10094;</button>
     <img class="image-modal-content" id="modal-img">
     <button class="modal-nav next" onclick="changeModalImg(1)">&#10095;</button>
+    
+    <div id="modal-indicator" class="modal-indicator">1 / 1</div>
+    <div id="modal-dots" class="modal-dots"></div>
   </div>
 
   <script>
@@ -133,25 +173,24 @@
     const zaloPhone = "84355967766"; 
     
     let cart = [];
-    let productsData = []; // Biến toàn cục lưu toàn bộ dữ liệu sản phẩm để Modal sử dụng
+    let productsData = [];
     
-    // Biến toàn cục cho Modal ảnh
     let currentModalProductId = null;
     let currentModalImgIndex = 0;
 
     window.onload = function() {
       loadProducts();
       fetchTinh(); 
-      setupModalSwipe(); // Khởi tạo tính năng vuốt trên điện thoại
+      setupModalSwipe();
     };
 
     async function loadProducts() {
       try {
         let response = await fetch(API_URL);
-        productsData = await response.json(); // Lưu vào biến toàn cục
+        productsData = await response.json(); 
         renderProducts(productsData);
       } catch (error) {
-        document.getElementById('loading').innerText = "Không thể tải dữ liệu, vui lòng kiểm tra lại Link API!";
+        document.getElementById('loading-text').innerHTML = "<span style='color:#ff4d4d;'>Không thể tải dữ liệu, vui lòng kiểm tra lại Link API!</span>";
       }
     }
 
@@ -184,16 +223,12 @@
 
     function formatMoney(amount) { return Number(amount).toLocaleString('vi-VN') + "đ"; }
 
-    // Tính năng trượt ảnh nhỏ
     function scrollCarousel(id, direction) {
       const container = document.getElementById(`slides-${id}`);
       const scrollAmount = container.clientWidth;
       container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
     }
 
-    // ==========================================
-    // LOGIC CHO TÍNH NĂNG PHÓNG TO ẢNH (MODAL)
-    // ==========================================
     function openModal(productId, index) {
       currentModalProductId = productId;
       currentModalImgIndex = index;
@@ -211,10 +246,14 @@
       
       currentModalImgIndex += delta;
       
-      // Vòng lặp: nếu lùi quá 0 thì quay về ảnh cuối, quá ảnh cuối thì về ảnh đầu
       if (currentModalImgIndex < 0) currentModalImgIndex = product.images.length - 1;
       if (currentModalImgIndex >= product.images.length) currentModalImgIndex = 0;
       
+      updateModalImage();
+    }
+    
+    function jumpToModalImg(index) {
+      currentModalImgIndex = index;
       updateModalImage();
     }
 
@@ -222,39 +261,53 @@
       let product = productsData.find(p => p.id === currentModalProductId);
       if (product && product.images[currentModalImgIndex]) {
         document.getElementById('modal-img').src = product.images[currentModalImgIndex];
+        
+        document.getElementById('modal-indicator').innerText = (currentModalImgIndex + 1) + " / " + product.images.length;
+        
+        let dotsContainer = document.getElementById('modal-dots');
+        dotsContainer.innerHTML = ''; 
+        
+        if (product.images.length > 1) {
+          for (let i = 0; i < product.images.length; i++) {
+            let dot = document.createElement('div');
+            dot.className = 'modal-dot' + (i === currentModalImgIndex ? ' active' : '');
+            dot.onclick = function(event) { 
+              event.stopPropagation(); 
+              jumpToModalImg(i); 
+            };
+            dotsContainer.appendChild(dot);
+          }
+        }
       }
     }
 
-    // Tính năng nhận diện vuốt (Swipe) trên điện thoại
     function setupModalSwipe() {
       const modal = document.getElementById('image-modal');
       let touchstartX = 0;
       let touchendX = 0;
 
       modal.addEventListener('touchstart', e => {
+        if(e.touches.length > 1) return;
         touchstartX = e.changedTouches[0].screenX;
       });
 
       modal.addEventListener('touchend', e => {
+        if(e.changedTouches.length > 1) return;
         touchendX = e.changedTouches[0].screenX;
         handleSwipe();
       });
 
       function handleSwipe() {
-        // Vuốt sang trái -> xem ảnh tiếp theo
         if (touchendX < touchstartX - 50) changeModalImg(1);
-        // Vuốt sang phải -> lùi lại ảnh trước
         if (touchendX > touchstartX + 50) changeModalImg(-1);
       }
 
-      // Đóng modal khi click ra bên ngoài ảnh
       window.onclick = function(event) {
         if (event.target == modal) {
           closeModal();
         }
       }
     }
-    // ==========================================
 
     function changeProductQty(id, delta) {
       let input = document.getElementById('qty-' + id);
@@ -271,7 +324,9 @@
     }
 
     function renderProducts(products) {
-      document.getElementById('loading').style.display = 'none';
+      // Ẩn mượt mà màn hình loading
+      document.getElementById('loading').classList.add('hidden');
+      
       const list = document.getElementById('product-list');
       
       products.forEach(p => {
@@ -299,7 +354,6 @@
 
         let safeName = p.name.replace(/'/g, "\\'");
         
-        // Gọi hàm openModal() khi click vào ảnh
         let imagesHtml = '';
         p.images.forEach((img, index) => {
           imagesHtml += `<img src="${img}" alt="${safeName}" onclick="openModal('${p.id}', ${index})">`;

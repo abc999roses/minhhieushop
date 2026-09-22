@@ -15,11 +15,11 @@
     .product-card { position: relative; background: #eef2f5; padding: 15px; border-radius: 8px; width: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; display: flex; flex-direction: column; }
     .discount-badge { position: absolute; top: 10px; right: 10px; background: #ffd127; color: #ee4d2d; padding: 4px 8px; font-size: 13px; font-weight: bold; border-radius: 3px; z-index: 10;}
     
-    /* Giao diện thanh trượt ảnh (Carousel) */
+    /* Giao diện thanh trượt ảnh nhỏ (Carousel) */
     .carousel { position: relative; width: 100%; height: 200px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; overflow: hidden; background: #fff;}
     .carousel-slides { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
     .carousel-slides::-webkit-scrollbar { display: none; }
-    .carousel-slides img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start; }
+    .carousel-slides img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start; cursor: zoom-in; }
     .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 2; transition: background 0.2s; }
     .carousel-btn:hover { background: rgba(0,0,0,0.8); }
     .carousel-btn.prev { left: 4px; }
@@ -63,6 +63,21 @@
     #floating-cart { position: fixed; bottom: 20px; right: 20px; background-color: #ff4757; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 1000; font-weight: bold; font-family: 'Montserrat', sans-serif; display: none; transition: transform 0.2s; }
     #floating-cart:hover { transform: scale(1.05); }
     #cart-count { background: white; color: #ff4757; border-radius: 50px; padding: 2px 8px; margin-left: 8px; font-size: 14px; }
+
+    /* CSS CHO MODAL PHÓNG TO ẢNH */
+    .image-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .image-modal-content { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; user-select: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    .close-modal { position: absolute; top: 15px; right: 25px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 2010; line-height: 1; }
+    .close-modal:hover { color: #ff4757; }
+    .modal-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 2010; display: flex; align-items: center; justify-content: center; transition: background 0.3s;}
+    .modal-nav:hover { background: rgba(255,255,255,0.5); }
+    .modal-nav.prev { left: 20px; }
+    .modal-nav.next { right: 20px; }
+    
+    /* Ẩn nút mũi tên trên điện thoại để nhường chỗ cho vuốt chạm */
+    @media (max-width: 600px) {
+      .modal-nav { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -102,6 +117,14 @@
     </div>
   </div>
 
+  <!-- Modal Phóng to ảnh -->
+  <div id="image-modal" class="image-modal">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
+    <button class="modal-nav prev" onclick="changeModalImg(-1)">&#10094;</button>
+    <img class="image-modal-content" id="modal-img">
+    <button class="modal-nav next" onclick="changeModalImg(1)">&#10095;</button>
+  </div>
+
   <script>
     // === DÁN LINK WEB APP CỦA GOOGLE SCRIPT VÀO DƯỚI ĐÂY ===
     const API_URL = "https://script.google.com/macros/s/AKfycby6UyHtOTUpx9o841UXf1DlUf-Pbvonf3e8IpHpnEFudmdfDdkRuLsz_wtEr3vKFdm_/exec"; 
@@ -110,17 +133,23 @@
     const zaloPhone = "84355967766"; 
     
     let cart = [];
+    let productsData = []; // Biến toàn cục lưu toàn bộ dữ liệu sản phẩm để Modal sử dụng
+    
+    // Biến toàn cục cho Modal ảnh
+    let currentModalProductId = null;
+    let currentModalImgIndex = 0;
 
     window.onload = function() {
       loadProducts();
       fetchTinh(); 
+      setupModalSwipe(); // Khởi tạo tính năng vuốt trên điện thoại
     };
 
     async function loadProducts() {
       try {
         let response = await fetch(API_URL);
-        let products = await response.json();
-        renderProducts(products);
+        productsData = await response.json(); // Lưu vào biến toàn cục
+        renderProducts(productsData);
       } catch (error) {
         document.getElementById('loading').innerText = "Không thể tải dữ liệu, vui lòng kiểm tra lại Link API!";
       }
@@ -155,12 +184,77 @@
 
     function formatMoney(amount) { return Number(amount).toLocaleString('vi-VN') + "đ"; }
 
-    // Tính toán trượt ảnh dựa trên chiều rộng hiển thị
+    // Tính năng trượt ảnh nhỏ
     function scrollCarousel(id, direction) {
       const container = document.getElementById(`slides-${id}`);
       const scrollAmount = container.clientWidth;
       container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
     }
+
+    // ==========================================
+    // LOGIC CHO TÍNH NĂNG PHÓNG TO ẢNH (MODAL)
+    // ==========================================
+    function openModal(productId, index) {
+      currentModalProductId = productId;
+      currentModalImgIndex = index;
+      updateModalImage();
+      document.getElementById('image-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('image-modal').style.display = 'none';
+    }
+
+    function changeModalImg(delta) {
+      let product = productsData.find(p => p.id === currentModalProductId);
+      if (!product) return;
+      
+      currentModalImgIndex += delta;
+      
+      // Vòng lặp: nếu lùi quá 0 thì quay về ảnh cuối, quá ảnh cuối thì về ảnh đầu
+      if (currentModalImgIndex < 0) currentModalImgIndex = product.images.length - 1;
+      if (currentModalImgIndex >= product.images.length) currentModalImgIndex = 0;
+      
+      updateModalImage();
+    }
+
+    function updateModalImage() {
+      let product = productsData.find(p => p.id === currentModalProductId);
+      if (product && product.images[currentModalImgIndex]) {
+        document.getElementById('modal-img').src = product.images[currentModalImgIndex];
+      }
+    }
+
+    // Tính năng nhận diện vuốt (Swipe) trên điện thoại
+    function setupModalSwipe() {
+      const modal = document.getElementById('image-modal');
+      let touchstartX = 0;
+      let touchendX = 0;
+
+      modal.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+      });
+
+      modal.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        handleSwipe();
+      });
+
+      function handleSwipe() {
+        // Vuốt sang trái -> xem ảnh tiếp theo
+        if (touchendX < touchstartX - 50) changeModalImg(1);
+        // Vuốt sang phải -> lùi lại ảnh trước
+        if (touchendX > touchstartX + 50) changeModalImg(-1);
+      }
+
+      // Đóng modal khi click ra bên ngoài ảnh
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          closeModal();
+        }
+      }
+    }
+    // ==========================================
 
     function changeProductQty(id, delta) {
       let input = document.getElementById('qty-' + id);
@@ -205,13 +299,12 @@
 
         let safeName = p.name.replace(/'/g, "\\'");
         
-        // Tạo chuỗi HTML chứa tất cả các ảnh của sản phẩm
+        // Gọi hàm openModal() khi click vào ảnh
         let imagesHtml = '';
-        p.images.forEach(img => {
-          imagesHtml += `<img src="${img}" alt="${safeName}">`;
+        p.images.forEach((img, index) => {
+          imagesHtml += `<img src="${img}" alt="${safeName}" onclick="openModal('${p.id}', ${index})">`;
         });
 
-        // Chỉ hiển thị 2 mũi tên trái/phải nếu sản phẩm đó có nhiều hơn 1 ảnh
         let arrowsHtml = '';
         if (p.images.length > 1) {
           arrowsHtml = `
